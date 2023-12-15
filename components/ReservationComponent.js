@@ -6,6 +6,7 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { format } from 'date-fns';
 import * as Animatable from "react-native-animatable";
 import * as Notifications from 'expo-notifications';
+import * as Calendar from 'expo-calendar';
 // class ModalContent extends Component {
 //     render() {
 //       return (
@@ -85,11 +86,36 @@ class Reservation extends Component {
       [
         { text: 'Cancel', onPress: () => this.resetForm() },
         { text: 'OK', onPress: () => {
+          this.addReservationToCalendar(this.state.date); this.resetForm();
           this.presentLocalNotification(this.state.date);
           this.resetForm();
         }},
       ]
     );
+  }
+  async addReservationToCalendar(date) {
+    const { status } = await Calendar.requestCalendarPermissionsAsync();
+    if (status === 'granted') {
+      const defaultCalendarSource = { isLocalAccount: true, name: 'Expo Calendar' };
+      const newCalendarID = await Calendar.createCalendarAsync({
+        title: 'Expo Calendar',
+        color: 'blue',
+        entityType: Calendar.EntityTypes.EVENT,
+        sourceId: defaultCalendarSource.id,
+        source: defaultCalendarSource,
+        name: 'internalCalendarName',
+        ownerAccount: 'personal',
+        accessLevel: Calendar.CalendarAccessLevel.OWNER,
+      });
+      const eventId = await Calendar.createEventAsync(newCalendarID, {
+        title: 'Confusion Table Reservation',
+        startDate: date,
+        endDate: new Date(date.getTime() + 2 * 60 * 60 * 1000),
+        timeZone: 'Asia/Hong_Kong',
+        location: '121, Clear Water Bay Road, Clear Water Bay, Kowloon, Hong Kong'
+      });
+      alert('Your new event ID is: ' + eventId);
+    }
   }
   async presentLocalNotification(date) {
     const { status } = await Notifications.requestPermissionsAsync();

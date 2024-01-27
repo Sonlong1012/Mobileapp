@@ -1,14 +1,18 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
-import HomeScreen from './screens/HomeScreen';
-
+import Main from './components/MainComponent';
+import { ConfigureStore } from './redux/ConfigureStore';
+import { PersistGate } from 'redux-persist/es/integration/react';
+import { Provider } from 'react-redux';
+const { persistor, store } = ConfigureStore();
 export default function App() {
   return (
-    <View style={appStyles.container}>
-     <HomeScreen/>
-      <StatusBar style="auto" />
-    </View>
+    <Provider store={store}>
+        {/* <PersistGate persistor={persistor}> */}
+          <Main />
+        {/* </PersistGate> */}
+      </Provider>
   );
 }
 
